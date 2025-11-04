@@ -13,10 +13,12 @@ from telegram.ext import (
 BOT_TOKEN = "8519013928:AAF5veC4-eA-JSdh2nPIsFoWvFGSyC7N5O8"
 # =======================================================
 
+# Set up logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+logger = logging.getLogger(__name__)
 
 # Conversation states
 (
@@ -26,6 +28,7 @@ logging.basicConfig(
     SIM_CARRIER, CONFIRM
 ) = range(17)
 
+# User data storage
 user_data = {}
 
 class OSINTDataCollector:
@@ -39,14 +42,18 @@ class OSINTDataCollector:
         }
 
     def validate_phone(self, phone):
-        if phone.lower() == 'skip': return True
+        if phone.lower() == 'skip': 
+            return True
         cleaned = re.sub(r'[\s\-\(\)]', '', phone)
         return re.match(r'^\+?[0-9]+$', cleaned) is not None
 
     def validate_age(self, age):
-        if age.lower() == 'skip': return True
-        try: return 1 <= int(age) <= 120
-        except ValueError: return False
+        if age.lower() == 'skip': 
+            return True
+        try: 
+            return 1 <= int(age) <= 120
+        except ValueError: 
+            return False
 
     def format_json(self, data):
         result = self.data_template.copy()
@@ -54,7 +61,7 @@ class OSINTDataCollector:
         result["timestamp"] = datetime.now().isoformat()
         return json.dumps(result, indent=2, ensure_ascii=False)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id] = {}
     
@@ -67,13 +74,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return NAME
 
-async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["name"] = update.message.text
     await update.message.reply_text("📞 **Phone Number:**\nEnter primary phone number (or 'skip'):")
     return NUMBER
 
-async def get_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     text = update.message.text
     collector = OSINTDataCollector()
@@ -84,43 +91,43 @@ async def get_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🌍 **Country:**\nEnter country name:")
     return COUNTRY
 
-async def get_country(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_country(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["country"] = update.message.text
     await update.message.reply_text("🇺🇸 **Country Code:**\nEnter code (e.g., US, IN, UK):")
     return COUNTRY_CODE
 
-async def get_country_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_country_code(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["country_code"] = update.message.text.upper()
     await update.message.reply_text("📍 **Location:**\nEnter city/state/region:")
     return LOCATION
 
-async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["location"] = update.message.text
     await update.message.reply_text("🏢 **Place:**\nEnter workplace/institution:")
     return PLACE
 
-async def get_place(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_place(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["place"] = update.message.text
     await update.message.reply_text("🏠 **Address:**\nEnter full address (or 'skip'):")
     return ADDRESS
 
-async def get_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_address(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["address"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     await update.message.reply_text("💳 **UPI ID:**\nEnter UPI ID (or 'skip'):")
     return UPI_ID
 
-async def get_upi_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_upi_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["upi_id"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     await update.message.reply_text("📱 **Telegram Number:**\nEnter Telegram number (or 'skip'):")
     return TELEGRAM_NUMBER
 
-async def get_telegram_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_telegram_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     text = update.message.text
     collector = OSINTDataCollector()
@@ -131,7 +138,7 @@ async def get_telegram_number(update: Update, context: ContextTypes.DEFAULT_TYPE
     await update.message.reply_text("💬 **WhatsApp Number:**\nEnter WhatsApp number (or 'skip'):")
     return WHATSAPP_NUMBER
 
-async def get_whatsapp_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_whatsapp_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     text = update.message.text
     collector = OSINTDataCollector()
@@ -142,7 +149,7 @@ async def get_whatsapp_number(update: Update, context: ContextTypes.DEFAULT_TYPE
     await update.message.reply_text("🎂 **Age:**\nEnter age (or 'skip'):")
     return AGE
 
-async def get_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     text = update.message.text
     collector = OSINTDataCollector()
@@ -153,25 +160,25 @@ async def get_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("📷 **Instagram:**\nEnter username (or 'skip'):")
     return INSTAGRAM
 
-async def get_instagram(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_instagram(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["instagram"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     await update.message.reply_text("👥 **Facebook:**\nEnter profile URL/username (or 'skip'):")
     return FACEBOOK
 
-async def get_facebook(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_facebook(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["facebook"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     await update.message.reply_text("🐦 **X (Twitter):**\nEnter username (or 'skip'):")
     return X
 
-async def get_x(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_x(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["x"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     await update.message.reply_text("✈️ **Telegram Username:**\nEnter username without @ (or 'skip'):")
     return TELEGRAM_USERNAME
 
-async def get_telegram_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_telegram_username(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     text = update.message.text
     if text.lower() != 'skip' and text.startswith('@'):
@@ -180,7 +187,7 @@ async def get_telegram_username(update: Update, context: ContextTypes.DEFAULT_TY
     await update.message.reply_text("📶 **SIM Carrier:**\nEnter mobile carrier (or 'skip'):")
     return SIM_CARRIER
 
-async def get_sim_carrier(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def get_sim_carrier(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     user_data[user_id]["sim_carrier"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     
@@ -211,7 +218,7 @@ def create_data_summary(data):
     
     return "\n".join(summary_lines) if summary_lines else "No data provided"
 
-async def confirm_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def confirm_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     
     if update.message.text.lower() == 'confirm':
@@ -236,7 +243,7 @@ async def confirm_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Cancelled. Use /start to begin.")
         return ConversationHandler.END
 
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.effective_user.id
     if user_id in user_data:
         del user_data[user_id]
@@ -256,56 +263,50 @@ Type 'skip' for optional fields.
 """
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
-async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle errors"""
-    logging.error(f"Exception while handling an update: {context.error}")
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle errors in the telegram bot."""
+    logger.error("Exception while handling an update:", exc_info=context.error)
 
-def main():
-    try:
-        # Create Application instead of Updater
-        application = Application.builder().token(BOT_TOKEN).build()
-        
-        # Add conversation handler with all the states
-        conv_handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start)],
-            states={
-                NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_name)],
-                NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_number)],
-                COUNTRY: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_country)],
-                COUNTRY_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_country_code)],
-                LOCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_location)],
-                PLACE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_place)],
-                ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_address)],
-                UPI_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_upi_id)],
-                TELEGRAM_NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_telegram_number)],
-                WHATSAPP_NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_whatsapp_number)],
-                AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_age)],
-                INSTAGRAM: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_instagram)],
-                FACEBOOK: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_facebook)],
-                X: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_x)],
-                TELEGRAM_USERNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_telegram_username)],
-                SIM_CARRIER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_sim_carrier)],
-                CONFIRM: [MessageHandler(filters.TEXT & ~filters.COMMAND, confirm_data)],
-            },
-            fallbacks=[CommandHandler('cancel', cancel)]
-        )
-        
-        application.add_handler(conv_handler)
-        application.add_handler(CommandHandler('help', help_command))
-        application.add_handler(CommandHandler('cancel', cancel))
-        
-        # Add error handler
-        application.add_error_handler(error_handler)
-        
-        print("🤖 Bot starting with compatible version...")
-        print("✅ Using python-telegram-bot v20.7")
-        
-        # Start polling
-        application.run_polling()
-        
-    except Exception as e:
-        print(f"❌ Bot failed to start: {str(e)}")
-        logging.error(f"Bot failed: {str(e)}")
+def main() -> None:
+    """Start the bot."""
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token(BOT_TOKEN).build()
 
-if __name__ == '__main__':
+    # Add conversation handler with the states
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_name)],
+            NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_number)],
+            COUNTRY: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_country)],
+            COUNTRY_CODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_country_code)],
+            LOCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_location)],
+            PLACE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_place)],
+            ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_address)],
+            UPI_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_upi_id)],
+            TELEGRAM_NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_telegram_number)],
+            WHATSAPP_NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_whatsapp_number)],
+            AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_age)],
+            INSTAGRAM: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_instagram)],
+            FACEBOOK: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_facebook)],
+            X: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_x)],
+            TELEGRAM_USERNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_telegram_username)],
+            SIM_CARRIER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_sim_carrier)],
+            CONFIRM: [MessageHandler(filters.TEXT & ~filters.COMMAND, confirm_data)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+    )
+
+    application.add_handler(conv_handler)
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("cancel", cancel))
+
+    # Add error handler
+    application.add_error_handler(error_handler)
+
+    # Start the Bot
+    print("🤖 Starting bot...")
+    application.run_polling()
+
+if __name__ == "__main__":
     main()
