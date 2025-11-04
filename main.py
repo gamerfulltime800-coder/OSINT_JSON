@@ -10,7 +10,7 @@ from telegram.ext import (
 )
 
 # ==================== CONFIGURATION ====================
-BOT_TOKEN = "8519013928:AAF5veC4-eA-JSdh2nPIsFoWvFGSyC7N5O8"  # REPLACE WITH YOUR REAL BOT TOKEN
+BOT_TOKEN = "8519013928:AAF5veC4-eA-JSdh2nPIsFoWvFGSyC7N5O8"
 # =======================================================
 
 logging.basicConfig(
@@ -257,10 +257,6 @@ Type 'skip' for optional fields.
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
 def main():
-    if BOT_TOKEN == "8519013928:AAF5veC4-eA-JSdh2nPIsFoWvFGSyC7N5O8" or not BOT_TOKEN:
-        print("❌ ERROR: Set your bot token in main.py!")
-        return
-    
     try:
         application = Application.builder().token(BOT_TOKEN).build()
         
@@ -292,7 +288,8 @@ def main():
         application.add_handler(CommandHandler('help', help_command))
         application.add_handler(CommandHandler('cancel', cancel))
         
-        print("🤖 Bot starting on Render...")
+        print("🤖 Bot starting with your token...")
+        print("✅ Token is set correctly!")
         application.run_polling()
         
     except Exception as e:
