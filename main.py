@@ -3,11 +3,6 @@ import json
 import re
 import logging
 from datetime import datetime
-from telegram import Update
-from telegram.ext import (
-    Updater, CommandHandler, MessageHandler, Filters,
-    ConversationHandler, CallbackContext
-)
 
 # ==================== CONFIGURATION ====================
 BOT_TOKEN = "8519013928:AAF5veC4-eA-JSdh2nPIsFoWvFGSyC7N5O8"
@@ -79,7 +74,7 @@ class OSINTDataCollector:
         result["timestamp"] = datetime.now().isoformat()
         return json.dumps(result, indent=2, ensure_ascii=False)
 
-def start(update: Update, context: CallbackContext) -> int:
+def start(update, context):
     """Start the conversation"""
     user_id = update.effective_user.id
     user_data[user_id] = {}
@@ -103,7 +98,7 @@ Let's start with the basic information. You can type 'skip' for any optional fie
     update.message.reply_text(welcome_text, parse_mode='Markdown')
     return NAME
 
-def get_name(update: Update, context: CallbackContext) -> int:
+def get_name(update, context):
     """Get the name"""
     user_id = update.effective_user.id
     user_data[user_id]["name"] = update.message.text
@@ -114,7 +109,7 @@ def get_name(update: Update, context: CallbackContext) -> int:
     )
     return NUMBER
 
-def get_number(update: Update, context: CallbackContext) -> int:
+def get_number(update, context):
     """Get phone number"""
     user_id = update.effective_user.id
     text = update.message.text
@@ -132,7 +127,7 @@ def get_number(update: Update, context: CallbackContext) -> int:
     )
     return COUNTRY
 
-def get_country(update: Update, context: CallbackContext) -> int:
+def get_country(update, context):
     """Get country"""
     user_id = update.effective_user.id
     user_data[user_id]["country"] = update.message.text
@@ -143,7 +138,7 @@ def get_country(update: Update, context: CallbackContext) -> int:
     )
     return COUNTRY_CODE
 
-def get_country_code(update: Update, context: CallbackContext) -> int:
+def get_country_code(update, context):
     """Get country code"""
     user_id = update.effective_user.id
     user_data[user_id]["country_code"] = update.message.text.upper()
@@ -154,7 +149,7 @@ def get_country_code(update: Update, context: CallbackContext) -> int:
     )
     return LOCATION
 
-def get_location(update: Update, context: CallbackContext) -> int:
+def get_location(update, context):
     """Get location"""
     user_id = update.effective_user.id
     user_data[user_id]["location"] = update.message.text
@@ -165,7 +160,7 @@ def get_location(update: Update, context: CallbackContext) -> int:
     )
     return PLACE
 
-def get_place(update: Update, context: CallbackContext) -> int:
+def get_place(update, context):
     """Get place"""
     user_id = update.effective_user.id
     user_data[user_id]["place"] = update.message.text
@@ -176,7 +171,7 @@ def get_place(update: Update, context: CallbackContext) -> int:
     )
     return ADDRESS
 
-def get_address(update: Update, context: CallbackContext) -> int:
+def get_address(update, context):
     """Get address"""
     user_id = update.effective_user.id
     user_data[user_id]["address"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
@@ -187,7 +182,7 @@ def get_address(update: Update, context: CallbackContext) -> int:
     )
     return UPI_ID
 
-def get_upi_id(update: Update, context: CallbackContext) -> int:
+def get_upi_id(update, context):
     """Get UPI ID"""
     user_id = update.effective_user.id
     user_data[user_id]["upi_id"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
@@ -198,7 +193,7 @@ def get_upi_id(update: Update, context: CallbackContext) -> int:
     )
     return TELEGRAM_NUMBER
 
-def get_telegram_number(update: Update, context: CallbackContext) -> int:
+def get_telegram_number(update, context):
     """Get Telegram number"""
     user_id = update.effective_user.id
     text = update.message.text
@@ -216,7 +211,7 @@ def get_telegram_number(update: Update, context: CallbackContext) -> int:
     )
     return WHATSAPP_NUMBER
 
-def get_whatsapp_number(update: Update, context: CallbackContext) -> int:
+def get_whatsapp_number(update, context):
     """Get WhatsApp number"""
     user_id = update.effective_user.id
     text = update.message.text
@@ -234,7 +229,7 @@ def get_whatsapp_number(update: Update, context: CallbackContext) -> int:
     )
     return AGE
 
-def get_age(update: Update, context: CallbackContext) -> int:
+def get_age(update, context):
     """Get age"""
     user_id = update.effective_user.id
     text = update.message.text
@@ -252,7 +247,7 @@ def get_age(update: Update, context: CallbackContext) -> int:
     )
     return INSTAGRAM
 
-def get_instagram(update: Update, context: CallbackContext) -> int:
+def get_instagram(update, context):
     """Get Instagram"""
     user_id = update.effective_user.id
     user_data[user_id]["instagram"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
@@ -263,7 +258,7 @@ def get_instagram(update: Update, context: CallbackContext) -> int:
     )
     return FACEBOOK
 
-def get_facebook(update: Update, context: CallbackContext) -> int:
+def get_facebook(update, context):
     """Get Facebook"""
     user_id = update.effective_user.id
     user_data[user_id]["facebook"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
@@ -274,7 +269,7 @@ def get_facebook(update: Update, context: CallbackContext) -> int:
     )
     return X
 
-def get_x(update: Update, context: CallbackContext) -> int:
+def get_x(update, context):
     """Get X (Twitter)"""
     user_id = update.effective_user.id
     user_data[user_id]["x"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
@@ -285,7 +280,7 @@ def get_x(update: Update, context: CallbackContext) -> int:
     )
     return TELEGRAM_USERNAME
 
-def get_telegram_username(update: Update, context: CallbackContext) -> int:
+def get_telegram_username(update, context):
     """Get Telegram username"""
     user_id = update.effective_user.id
     text = update.message.text
@@ -300,7 +295,7 @@ def get_telegram_username(update: Update, context: CallbackContext) -> int:
     )
     return SIM_CARRIER
 
-def get_sim_carrier(update: Update, context: CallbackContext) -> int:
+def get_sim_carrier(update, context):
     """Get SIM carrier details"""
     user_id = update.effective_user.id
     user_data[user_id]["sim_carrier"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
@@ -343,7 +338,7 @@ def create_data_summary(data):
     
     return "\n".join(summary_lines) if summary_lines else "No data provided"
 
-def confirm_data(update: Update, context: CallbackContext) -> int:
+def confirm_data(update, context):
     """Confirm and save the data"""
     user_id = update.effective_user.id
     
@@ -384,7 +379,7 @@ def confirm_data(update: Update, context: CallbackContext) -> int:
         )
         return ConversationHandler.END
 
-def cancel(update: Update, context: CallbackContext) -> int:
+def cancel(update, context):
     """Cancel the conversation"""
     user_id = update.effective_user.id
     if user_id in user_data:
@@ -396,7 +391,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
     )
     return ConversationHandler.END
 
-def help_command(update: Update, context: CallbackContext):
+def help_command(update, context):
     """Show help message"""
     help_text = """
 🕵️ **Advanced OSINT Data Collection Bot**
@@ -434,7 +429,7 @@ The bot will output a formatted JSON file with all collected data.
     """
     update.message.reply_text(help_text, parse_mode='Markdown')
 
-def error_handler(update: Update, context: CallbackContext):
+def error_handler(update, context):
     """Handle errors"""
     logger.error(f"Exception while handling an update: {context.error}")
 
@@ -443,6 +438,10 @@ def main():
     print("🤖 Starting Advanced OSINT Bot...")
     
     try:
+        # Import here to avoid issues
+        from telegram.ext import Updater, CommandHandler, MessageHandler, ConversationHandler
+        from telegram import Update
+        
         # Create the Updater and pass it your bot's token
         updater = Updater(BOT_TOKEN, use_context=True)
         
