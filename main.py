@@ -256,10 +256,16 @@ Type 'skip' for optional fields.
 """
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
+async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle errors"""
+    logging.error(f"Exception while handling an update: {context.error}")
+
 def main():
     try:
+        # Create Application instead of Updater
         application = Application.builder().token(BOT_TOKEN).build()
         
+        # Add conversation handler with all the states
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', start)],
             states={
@@ -288,12 +294,18 @@ def main():
         application.add_handler(CommandHandler('help', help_command))
         application.add_handler(CommandHandler('cancel', cancel))
         
-        print("🤖 Bot starting with your token...")
-        print("✅ Token is set correctly!")
+        # Add error handler
+        application.add_error_handler(error_handler)
+        
+        print("🤖 Bot starting with compatible version...")
+        print("✅ Using python-telegram-bot v20.7")
+        
+        # Start polling
         application.run_polling()
         
     except Exception as e:
-        print(f"❌ Bot failed: {str(e)}")
+        print(f"❌ Bot failed to start: {str(e)}")
+        logging.error(f"Bot failed: {str(e)}")
 
 if __name__ == '__main__':
     main()
