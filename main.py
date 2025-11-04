@@ -49,16 +49,12 @@ class OSINTDataCollector:
         }
 
     def validate_phone(self, phone):
-        """Basic phone number validation"""
         if phone.lower() == 'skip':
             return True
-        # Remove spaces, dashes, parentheses
         cleaned = re.sub(r'[\s\-\(\)]', '', phone)
-        # Check if it contains only numbers and optional +
         return re.match(r'^\+?[0-9]+$', cleaned) is not None
 
     def validate_age(self, age):
-        """Validate age input"""
         if age.lower() == 'skip':
             return True
         try:
@@ -68,14 +64,12 @@ class OSINTDataCollector:
             return False
 
     def format_json(self, data):
-        """Format collected data as JSON"""
         result = self.data_template.copy()
         result.update(data)
         result["timestamp"] = datetime.now().isoformat()
         return json.dumps(result, indent=2, ensure_ascii=False)
 
 def start(update, context):
-    """Start the conversation"""
     user_id = update.effective_user.id
     user_data[user_id] = {}
     
@@ -99,236 +93,140 @@ Let's start with the basic information. You can type 'skip' for any optional fie
     return NAME
 
 def get_name(update, context):
-    """Get the name"""
     user_id = update.effective_user.id
     user_data[user_id]["name"] = update.message.text
-    
-    update.message.reply_text(
-        "📞 **Phone Number:**\n"
-        "Enter primary phone number (or type 'skip'):"
-    )
+    update.message.reply_text("📞 **Phone Number:**\nEnter primary phone number (or type 'skip'):")
     return NUMBER
 
 def get_number(update, context):
-    """Get phone number"""
     user_id = update.effective_user.id
     text = update.message.text
-    
     collector = OSINTDataCollector()
     if text.lower() != 'skip' and not collector.validate_phone(text):
         update.message.reply_text("❌ Invalid phone number format. Please enter a valid number or type 'skip':")
         return NUMBER
-    
     user_data[user_id]["number"] = text if text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "🌍 **Country:**\n"
-        "Enter country name:"
-    )
+    update.message.reply_text("🌍 **Country:**\nEnter country name:")
     return COUNTRY
 
 def get_country(update, context):
-    """Get country"""
     user_id = update.effective_user.id
     user_data[user_id]["country"] = update.message.text
-    
-    update.message.reply_text(
-        "🇺🇸 **Country Code:**\n"
-        "Enter country code (e.g., US, IN, UK, CA):"
-    )
+    update.message.reply_text("🇺🇸 **Country Code:**\nEnter country code (e.g., US, IN, UK, CA):")
     return COUNTRY_CODE
 
 def get_country_code(update, context):
-    """Get country code"""
     user_id = update.effective_user.id
     user_data[user_id]["country_code"] = update.message.text.upper()
-    
-    update.message.reply_text(
-        "📍 **Location:**\n"
-        "Enter general location (city/state/region):"
-    )
+    update.message.reply_text("📍 **Location:**\nEnter general location (city/state/region):")
     return LOCATION
 
 def get_location(update, context):
-    """Get location"""
     user_id = update.effective_user.id
     user_data[user_id]["location"] = update.message.text
-    
-    update.message.reply_text(
-        "🏢 **Place:**\n"
-        "Enter specific place (workplace, institution, etc.):"
-    )
+    update.message.reply_text("🏢 **Place:**\nEnter specific place (workplace, institution, etc.):")
     return PLACE
 
 def get_place(update, context):
-    """Get place"""
     user_id = update.effective_user.id
     user_data[user_id]["place"] = update.message.text
-    
-    update.message.reply_text(
-        "🏠 **Address:**\n"
-        "Enter full address (or type 'skip'):"
-    )
+    update.message.reply_text("🏠 **Address:**\nEnter full address (or type 'skip'):")
     return ADDRESS
 
 def get_address(update, context):
-    """Get address"""
     user_id = update.effective_user.id
     user_data[user_id]["address"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "💳 **UPI ID:**\n"
-        "Enter UPI ID (e.g., name@bank) or type 'skip':"
-    )
+    update.message.reply_text("💳 **UPI ID:**\nEnter UPI ID (e.g., name@bank) or type 'skip':")
     return UPI_ID
 
 def get_upi_id(update, context):
-    """Get UPI ID"""
     user_id = update.effective_user.id
     user_data[user_id]["upi_id"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "📱 **Telegram Number:**\n"
-        "Enter Telegram-associated number (or type 'skip'):"
-    )
+    update.message.reply_text("📱 **Telegram Number:**\nEnter Telegram-associated number (or type 'skip'):")
     return TELEGRAM_NUMBER
 
 def get_telegram_number(update, context):
-    """Get Telegram number"""
     user_id = update.effective_user.id
     text = update.message.text
-    
     collector = OSINTDataCollector()
     if text.lower() != 'skip' and not collector.validate_phone(text):
         update.message.reply_text("❌ Invalid phone number format. Please enter a valid number or type 'skip':")
         return TELEGRAM_NUMBER
-    
     user_data[user_id]["telegram_number"] = text if text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "💬 **WhatsApp Number:**\n"
-        "Enter WhatsApp number (or type 'skip'):"
-    )
+    update.message.reply_text("💬 **WhatsApp Number:**\nEnter WhatsApp number (or type 'skip'):")
     return WHATSAPP_NUMBER
 
 def get_whatsapp_number(update, context):
-    """Get WhatsApp number"""
     user_id = update.effective_user.id
     text = update.message.text
-    
     collector = OSINTDataCollector()
     if text.lower() != 'skip' and not collector.validate_phone(text):
         update.message.reply_text("❌ Invalid phone number format. Please enter a valid number or type 'skip':")
         return WHATSAPP_NUMBER
-    
     user_data[user_id]["whatsapp_number"] = text if text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "🎂 **Age:**\n"
-        "Enter age (or type 'skip'):"
-    )
+    update.message.reply_text("🎂 **Age:**\nEnter age (or type 'skip'):")
     return AGE
 
 def get_age(update, context):
-    """Get age"""
     user_id = update.effective_user.id
     text = update.message.text
-    
     collector = OSINTDataCollector()
     if text.lower() != 'skip' and not collector.validate_age(text):
         update.message.reply_text("❌ Invalid age. Please enter a number between 1-120 or type 'skip':")
         return AGE
-    
     user_data[user_id]["age"] = text if text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "📷 **Instagram:**\n"
-        "Enter Instagram username (or type 'skip'):"
-    )
+    update.message.reply_text("📷 **Instagram:**\nEnter Instagram username (or type 'skip'):")
     return INSTAGRAM
 
 def get_instagram(update, context):
-    """Get Instagram"""
     user_id = update.effective_user.id
     user_data[user_id]["instagram"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "👥 **Facebook:**\n"
-        "Enter Facebook profile URL or username (or type 'skip'):"
-    )
+    update.message.reply_text("👥 **Facebook:**\nEnter Facebook profile URL or username (or type 'skip'):")
     return FACEBOOK
 
 def get_facebook(update, context):
-    """Get Facebook"""
     user_id = update.effective_user.id
     user_data[user_id]["facebook"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "🐦 **X (Twitter):**\n"
-        "Enter X (Twitter) username (or type 'skip'):"
-    )
+    update.message.reply_text("🐦 **X (Twitter):**\nEnter X (Twitter) username (or type 'skip'):")
     return X
 
 def get_x(update, context):
-    """Get X (Twitter)"""
     user_id = update.effective_user.id
     user_data[user_id]["x"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "✈️ **Telegram Username:**\n"
-        "Enter Telegram username (without @) or type 'skip':"
-    )
+    update.message.reply_text("✈️ **Telegram Username:**\nEnter Telegram username (without @) or type 'skip':")
     return TELEGRAM_USERNAME
 
 def get_telegram_username(update, context):
-    """Get Telegram username"""
     user_id = update.effective_user.id
     text = update.message.text
     if text.lower() != 'skip' and text.startswith('@'):
         text = text[1:]
-    
     user_data[user_id]["telegram"] = text if text.lower() != 'skip' else "Not provided"
-    
-    update.message.reply_text(
-        "📶 **SIM Carrier:**\n"
-        "Enter mobile carrier (e.g., Verizon, Airtel, Jio, Vodafone) or type 'skip':"
-    )
+    update.message.reply_text("📶 **SIM Carrier:**\nEnter mobile carrier (or type 'skip'):")
     return SIM_CARRIER
 
 def get_sim_carrier(update, context):
-    """Get SIM carrier details"""
     user_id = update.effective_user.id
     user_data[user_id]["sim_carrier"] = update.message.text if update.message.text.lower() != 'skip' else "Not provided"
     
-    # Show preview and ask for confirmation
     collector = OSINTDataCollector()
     preview_json = collector.format_json(user_data[user_id])
     
-    # Create a summary for quick review
     summary = create_data_summary(user_data[user_id])
     
     update.message.reply_text(
         f"📋 **Data Summary:**\n{summary}\n\n"
-        "**Full JSON Preview:**\n"
-        f"```json\n{preview_json}\n```\n\n"
         "Type 'confirm' to save as JSON or 'cancel' to start over:",
         parse_mode='Markdown'
     )
     return CONFIRM
 
 def create_data_summary(data):
-    """Create a human-readable summary of collected data"""
     summary_lines = []
     fields = [
-        ("Name", "name"),
-        ("Phone", "number"),
-        ("Country", "country"),
-        ("Location", "location"),
-        ("Age", "age"),
-        ("Telegram", "telegram"),
-        ("Instagram", "instagram"),
-        ("X", "x"),
-        ("SIM Carrier", "sim_carrier")
+        ("Name", "name"), ("Phone", "number"), ("Country", "country"),
+        ("Location", "location"), ("Age", "age"), ("Telegram", "telegram"),
+        ("Instagram", "instagram"), ("X", "x"), ("SIM Carrier", "sim_carrier")
     ]
     
     for display_name, field_name in fields:
@@ -339,116 +237,62 @@ def create_data_summary(data):
     return "\n".join(summary_lines) if summary_lines else "No data provided"
 
 def confirm_data(update, context):
-    """Confirm and save the data"""
     user_id = update.effective_user.id
     
     if update.message.text.lower() == 'confirm':
         collector = OSINTDataCollector()
         final_json = collector.format_json(user_data[user_id])
         
-        # Send JSON as file
         filename = f"osint_data_{user_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         
         update.message.reply_document(
             document=final_json.encode('utf-8'),
             filename=filename,
-            caption="✅ **OSINT data saved as JSON file!**\n\nUse /start to collect new data.",
+            caption="✅ **OSINT data saved as JSON!**\nUse /start for new data.",
             parse_mode='Markdown'
         )
         
-        # Also send a readable version in chat
-        summary = create_data_summary(user_data[user_id])
-        update.message.reply_text(
-            f"📊 **Data Collected Successfully!**\n\n{summary}",
-            parse_mode='Markdown'
-        )
-        
-        # Clean up user data
         if user_id in user_data:
             del user_data[user_id]
-            
         return ConversationHandler.END
     else:
-        # Cancel and start over
         if user_id in user_data:
             del user_data[user_id]
-        
-        update.message.reply_text(
-            "❌ Data collection cancelled.\n\n"
-            "Use /start to begin new data collection."
-        )
+        update.message.reply_text("❌ Cancelled. Use /start to begin.")
         return ConversationHandler.END
 
 def cancel(update, context):
-    """Cancel the conversation"""
     user_id = update.effective_user.id
     if user_id in user_data:
         del user_data[user_id]
-    
-    update.message.reply_text(
-        "❌ Data collection cancelled.\n\n"
-        "Use /start when you're ready to begin."
-    )
+    update.message.reply_text("❌ Cancelled. Use /start to begin.")
     return ConversationHandler.END
 
 def help_command(update, context):
-    """Show help message"""
     help_text = """
-🕵️ **Advanced OSINT Data Collection Bot**
+🕵️ **OSINT Data Collection Bot**
 
 **Commands:**
-/start - Start collecting OSINT data
-/help - Show this help message
-/cancel - Cancel current data collection
+/start - Start collecting data
+/help - Show this message
+/cancel - Cancel current collection
 
-**All Data Fields:**
-• Name
-• Number
-• Country
-• Country Code
-• Location
-• Place
-• Address
-• UPI ID
-• Telegram Number
-• WhatsApp Number
-• Age
-• Instagram
-• Facebook
-• X (Twitter)
-• Telegram Username
-• SIM Carrier
-
-**Instructions:**
-- Type 'skip' for any optional field
-- Phone numbers should be in international format
-- Age should be between 1-120
-- Usernames without @ symbols
-
-The bot will output a formatted JSON file with all collected data.
-    """
+Type 'skip' for optional fields.
+"""
     update.message.reply_text(help_text, parse_mode='Markdown')
 
 def error_handler(update, context):
-    """Handle errors"""
     logger.error(f"Exception while handling an update: {context.error}")
 
 def main():
-    """Start the bot."""
-    print("🤖 Starting Advanced OSINT Bot...")
+    print("🤖 Starting OSINT Bot...")
     
     try:
-        # Import here to avoid issues
-        from telegram.ext import Updater, CommandHandler, MessageHandler, ConversationHandler
-        from telegram import Update
+        from telegram.ext import Updater, CommandHandler, MessageHandler, ConversationHandler, Filters
         
-        # Create the Updater and pass it your bot's token
         updater = Updater(BOT_TOKEN, use_context=True)
-        
-        # Get the dispatcher to register handlers
         dispatcher = updater.dispatcher
 
-        # Add conversation handler with the states
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', start)],
             states={
@@ -473,27 +317,16 @@ def main():
             fallbacks=[CommandHandler('cancel', cancel)]
         )
 
-        # Add handlers
         dispatcher.add_handler(conv_handler)
         dispatcher.add_handler(CommandHandler('help', help_command))
         dispatcher.add_handler(CommandHandler('cancel', cancel))
 
-        # Add error handler
-        dispatcher.add_error_handler(error_handler)
-
-        # Start the Bot
         print("✅ Bot started successfully!")
-        print("📱 Waiting for messages...")
-        
-        # Start the Bot
         updater.start_polling()
-        
-        # Run the bot until you press Ctrl-C
         updater.idle()
         
     except Exception as e:
         print(f"❌ Failed to start bot: {str(e)}")
-        logger.error(f"Bot failed to start: {str(e)}")
 
 if __name__ == '__main__':
     main()
